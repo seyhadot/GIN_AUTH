@@ -1,0 +1,57 @@
+@base_url = http://localhost:8080
+@auth_token = {{login.response.body.token}}
+
+### Register User
+# @name register
+POST {{base_url}}/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "password"
+}
+
+### Login User
+# @name login
+POST {{base_url}}/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "password"
+}
+
+
+### Get Current User Profile
+# @name profile
+GET {{base_url}}/api/profile
+Authorization: Bearer {{auth_token}}
+
+### Update User Profile
+# @name update_profile
+PUT {{base_url}}/api/profile
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "full_name": "Updated Name",
+    "bio": "Updated bio information",
+    "avatar": "https://example.com/new-avatar.jpg"
+}
+
+### Update Password
+# @name update_password
+PUT {{base_url}}/api/password
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "current_password": "password",
+    "new_password": "password"
+}
+
+
+### Get All Users (Default Pagination)
+# @name get_all_users
+GET {{base_url}}/api/users
+Authorization: Bearer {{auth_token}}
