@@ -1,0 +1,101 @@
+@base_url = http://localhost:8080
+@auth_token = {{login.response.body.token}}
+
+### Register as admin first
+# @name register
+POST {{base_url}}/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "admin123",
+    "password": "password",
+    "full_name": "Admin User"
+}
+
+### Login as admin first
+# @name login
+POST {{base_url}}/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin123",
+    "password": "password"
+}
+
+### Create a company
+# @name createCompany
+POST {{base_url}}/api/companies
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Tech Corp Ltd",
+    "address": "123 Innovation Street",
+    "phone": "+1234567890",
+    "email": "contact@techcorp.com",
+    "website": "https://techcorp.com",
+    "tax_id": "TAX123456789",
+    "business_type": "corporation"
+}
+
+### Create a branch office
+# @name createBranch
+POST {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Downtown Branch",
+    "address": "456 Downtown St",
+    "phone": "+1987654321",
+    "email": "downtown@techcorp.com"
+}
+
+### Register a new staff member
+# @name registerStaff
+POST {{base_url}}/api/auth/staff/register
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "username": "staff123",
+    "password": "password123",
+    "full_name": "Staff Member 1",
+    "roles": ["staff"],
+    "company_id": "{{createCompany.response.body.id}}",
+    "branch_offices": ["{{createBranch.response.body.id}}"]
+}
+
+### Login as staff
+# @name staffLogin
+POST {{base_url}}/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "staff123",
+    "password": "password123"
+}
+
+### Assign staff to additional branch office
+# @name assignStaff
+POST {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches/{{createBranch.response.body.id}}/staff
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "user_id": "{{registerStaff.response.body.user.id}}",
+    "company_id": "{{createCompany.response.body.id}}",
+    "branch_offices": ["{{createBranch.response.body.id}}"]
+}
+
+### List staff in branch office
+GET {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches/{{createBranch.response.body.id}}/staff
+Authorization: Bearer {{auth_token}}
+
+### Remove staff from branch office
+DELETE {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches/{{createBranch.response.body.id}}/staff/{{registerStaff.response.body.user.id}}
+Authorization: Bearer {{auth_token}}
+
+### Get staff profile (should show branch office assignments)
+GET {{base_url}}/api/users/profile
+Authorization: Bearer {{staffLogin.response.body.token}}

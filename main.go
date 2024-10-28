@@ -2,12 +2,14 @@ package main
 
 import (
 	"loan/config"
+	"loan/middleware"
 	"loan/routes"
 	"loan/utils"
 	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
 func main() {
@@ -24,6 +26,10 @@ func main() {
 
 	// CORS configuration
 	router.Use(cors.New(config.GetCorsConfig()))
+
+	// Setup rate limiter - 100 requests per minute
+	limiter := middleware.NewIPRateLimiter(rate.Limit(100/60.0), 5)
+	router.Use(middleware.RateLimitMiddleware(limiter))
 
 	// Setup routes
 	routes.SetupRoutes(router, cfg)

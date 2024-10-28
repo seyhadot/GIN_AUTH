@@ -1,0 +1,100 @@
+@base_url = http://localhost:8080
+@auth_token = {{login.response.body.token}}
+
+### Login first to get token
+# @name login
+POST {{base_url}}/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "password"
+}
+
+### Create Company
+# @name createCompany
+POST {{base_url}}/api/companies
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Tech Corp Ltd",
+    "address": "123 Innovation Street, Tech Valley",
+    "phone": "+1234567890",
+    "email": "contact@techcorp.com",
+    "website": "https://techcorp.com",
+    "tax_id": "TAX123456789",
+    "business_type": "corporation"
+}
+
+### Get Company by ID
+# @name getCompany
+GET {{base_url}}/api/companies/detail/{{createCompany.response.body.id}}
+Authorization: Bearer {{auth_token}}
+
+### List Companies (with pagination)
+# @name listCompanies
+GET {{base_url}}/api/companies?page=1&limit=10
+Authorization: Bearer {{auth_token}}
+
+### Create Branch Office for Company
+# @name createBranch
+POST {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Downtown Branch",
+    "address": "456 Downtown St",
+    "phone": "+1987654321",
+    "email": "downtown@techcorp.com"
+}
+
+### List Branch Offices for Company
+# @name listBranches
+GET {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches
+Authorization: Bearer {{auth_token}}
+
+### Get Branch Office Details
+GET {{base_url}}/api/companies/{{createCompany.response.body.id}}/branches/{{createBranch.response.body.id}}
+Authorization: Bearer {{auth_token}}
+
+### Update Company
+# @name updateCompany
+PUT {{base_url}}/api/companies/detail/{{createCompany.response.body.id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Tech Corp Ltd Updated",
+    "address": "456 Innovation Avenue, Tech City",
+    "phone": "+1987654321",
+    "email": "newcontact@techcorp.com",
+    "website": "https://techcorp.com/new",
+    "tax_id": "TAX987654321",
+    "business_type": "corporation"
+}
+
+### Delete Company
+# @name deleteCompany
+DELETE {{base_url}}/api/companies/detail/{{createCompany.response.body.id}}
+Authorization: Bearer {{auth_token}}
+
+### List Companies with Different Page Size
+GET {{base_url}}/api/companies?page=1&limit=5
+Authorization: Bearer {{auth_token}}
+
+### Create Another Company
+POST {{base_url}}/api/companies
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+    "name": "Global Solutions Inc",
+    "address": "789 Business Park, Commerce City",
+    "phone": "+1122334455",
+    "email": "info@globalsolutions.com",
+    "website": "https://globalsolutions.com",
+    "tax_id": "TAX987987987",
+    "business_type": "llc"
+}
